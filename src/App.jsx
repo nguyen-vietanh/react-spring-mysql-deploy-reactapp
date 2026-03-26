@@ -9,7 +9,7 @@ function App() {
 
   const callApi = async () => {
     try {
-      const response = await fetch('https://react-spring-mysql-deploy-springapp.onrender.com/hello');
+      const response = await fetch(`${import.meta.env.VITE_BE_BASE_URL}/hello`);
       const data = await response.text();
       globalThis.alert(data);
     } catch (error) {
