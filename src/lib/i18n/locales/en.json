@@ -36,8 +36,18 @@
         }
       },
       "submit": "Create account",
+      "submitting": "Creating account...",
       "haveAccount": "Already have an account?",
-      "login": "Log in"
+      "login": "Log in",
+      "success": {
+        "title": "Check your email",
+        "message": "Account created! Please check your email to activate your account.",
+        "emailFailed": "Account created but the confirmation email could not be sent. Please contact support or use the resend email feature."
+      },
+      "errors": {
+        "NETWORK_ERROR": "Could not reach the server. Please check your connection.",
+        "UNKNOWN_ERROR": "An unexpected error occurred. Please try again or contact support."
+      }
     }
   }
 }
