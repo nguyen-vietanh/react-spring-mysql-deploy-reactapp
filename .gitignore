@@ -25,3 +25,12 @@ dist-ssr
 
 # .env files
 .env.development
+
+# antigravity .agent folder
+.agent/
+
+# claude .claude folder
+.claude/
+
+# docs folder
+docs/
