@@ -27,7 +27,7 @@ function FormField({ id, label, required, error, children }) {
     <div className="flex flex-col gap-1.5">
       <label
         htmlFor={id}
-        className="text-sm font-semibold text-[#4A4A4A] tracking-wide"
+        className="text-sm font-semibold text-[#4A4A4A] dark:text-[#9E9E9E] tracking-wide"
       >
         {label}
         {required && (
@@ -44,12 +44,28 @@ function FormField({ id, label, required, error, children }) {
         id={`${id}-error`}
         role="alert"
         aria-live="polite"
-        className={`text-xs text-[#B91C1C] min-h-[18px] ${error ? 'visible' : 'invisible'}`}
+        className={`text-xs text-[#B91C1C] dark:text-[#F87171] min-h-[18px] ${error ? 'visible' : 'invisible'}`}
       >
         {error ?? ''}
       </span>
     </div>
   )
+}
+
+// Input class builder — kept as a function to avoid duplicating the long string 4 times
+function inputClass(hasError) {
+  return `
+    h-12 w-full rounded-lg border px-4 text-base
+    text-[#0A0A0A] dark:text-[#F0F0F0]
+    placeholder:text-[#9E9E9E] dark:placeholder:text-[#717171]
+    outline-none transition-all duration-150
+    hover:border-[#C4C4C4] dark:hover:border-[#4A4A4A]
+    focus:ring-[3px] focus:ring-[rgba(37,99,235,0.25)]
+    ${hasError
+      ? 'border-[#DC2626] bg-[#FEF2F2] focus:border-[#DC2626] dark:bg-[#2D1515] dark:border-[#DC2626]'
+      : 'border-[#E0E0E0] bg-white focus:border-[#0A0A0A] dark:border-[#2E2E2E] dark:bg-[#1F1F1F] dark:focus:border-[#F0F0F0]'
+    }
+  `
 }
 
 export default function RegisterPage() {
@@ -79,7 +95,10 @@ export default function RegisterPage() {
 
   return (
     <main
-      className="min-h-screen bg-[#FFFFFF] flex flex-col items-center justify-center px-4 py-12"
+      className="min-h-screen
+                 bg-[#FFFFFF] dark:bg-[#111111]
+                 flex flex-col items-center justify-center px-4 py-12
+                 transition-colors duration-200"
       aria-label="Trang đăng ký tài khoản"
     >
       {/* Card container */}
@@ -89,9 +108,11 @@ export default function RegisterPage() {
         <div className="mb-8 text-center">
           <Link
             to="/"
-            className="inline-block text-2xl font-bold text-[#0A0A0A] tracking-tight
+            className="inline-block text-2xl font-bold
+                       text-[#0A0A0A] dark:text-[#F0F0F0]
+                       tracking-tight
                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]
-                       rounded-sm"
+                       rounded-sm transition-colors duration-150"
             aria-label="Trang chủ Website Bán Sách"
           >
             Bookstore
@@ -100,10 +121,10 @@ export default function RegisterPage() {
 
         {/* Heading */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-[#0A0A0A] tracking-tight leading-tight">
+          <h1 className="text-3xl font-bold text-[#0A0A0A] dark:text-[#F0F0F0] tracking-tight leading-tight">
             Tạo tài khoản
           </h1>
-          <p className="mt-2 text-base text-[#4A4A4A]">
+          <p className="mt-2 text-base text-[#4A4A4A] dark:text-[#9E9E9E]">
             Đăng ký để bắt đầu mua sách
           </p>
         </div>
@@ -128,17 +149,7 @@ export default function RegisterPage() {
               aria-required="true"
               aria-invalid={errors.fullName ? 'true' : 'false'}
               aria-describedby="fullName-error"
-              className={`
-                h-12 w-full rounded-lg border px-4 text-base text-[#0A0A0A]
-                placeholder:text-[#9E9E9E] bg-white
-                outline-none transition-all duration-150
-                hover:border-[#C4C4C4]
-                focus:border-[#0A0A0A] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.25)]
-                ${errors.fullName
-                  ? 'border-[#DC2626] bg-[#FEF2F2]'
-                  : 'border-[#E0E0E0]'
-                }
-              `}
+              className={inputClass(errors.fullName)}
             />
           </FormField>
 
@@ -154,17 +165,7 @@ export default function RegisterPage() {
               aria-required="true"
               aria-invalid={errors.email ? 'true' : 'false'}
               aria-describedby="email-error"
-              className={`
-                h-12 w-full rounded-lg border px-4 text-base text-[#0A0A0A]
-                placeholder:text-[#9E9E9E] bg-white
-                outline-none transition-all duration-150
-                hover:border-[#C4C4C4]
-                focus:border-[#0A0A0A] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.25)]
-                ${errors.email
-                  ? 'border-[#DC2626] bg-[#FEF2F2]'
-                  : 'border-[#E0E0E0]'
-                }
-              `}
+              className={inputClass(errors.email)}
             />
           </FormField>
 
@@ -181,24 +182,16 @@ export default function RegisterPage() {
                 aria-required="true"
                 aria-invalid={errors.password ? 'true' : 'false'}
                 aria-describedby="password-error"
-                className={`
-                  h-12 w-full rounded-lg border px-4 pr-12 text-base text-[#0A0A0A]
-                  placeholder:text-[#9E9E9E] bg-white
-                  outline-none transition-all duration-150
-                  hover:border-[#C4C4C4]
-                  focus:border-[#0A0A0A] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.25)]
-                  ${errors.password
-                    ? 'border-[#DC2626] bg-[#FEF2F2]'
-                    : 'border-[#E0E0E0]'
-                  }
-                `}
+                className={inputClass(errors.password) + ' pr-12'}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
                 aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                 className="absolute right-3 top-1/2 -translate-y-1/2
-                           text-[#9E9E9E] hover:text-[#4A4A4A] transition-colors duration-150
+                           text-[#9E9E9E] hover:text-[#4A4A4A]
+                           dark:text-[#717171] dark:hover:text-[#C4C4C4]
+                           transition-colors duration-150
                            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]
                            rounded-sm p-0.5"
               >
@@ -220,24 +213,16 @@ export default function RegisterPage() {
                 aria-required="true"
                 aria-invalid={errors.confirmPassword ? 'true' : 'false'}
                 aria-describedby="confirmPassword-error"
-                className={`
-                  h-12 w-full rounded-lg border px-4 pr-12 text-base text-[#0A0A0A]
-                  placeholder:text-[#9E9E9E] bg-white
-                  outline-none transition-all duration-150
-                  hover:border-[#C4C4C4]
-                  focus:border-[#0A0A0A] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.25)]
-                  ${errors.confirmPassword
-                    ? 'border-[#DC2626] bg-[#FEF2F2]'
-                    : 'border-[#E0E0E0]'
-                  }
-                `}
+                className={inputClass(errors.confirmPassword) + ' pr-12'}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword((v) => !v)}
                 aria-label={showConfirmPassword ? 'Ẩn mật khẩu xác nhận' : 'Hiện mật khẩu xác nhận'}
                 className="absolute right-3 top-1/2 -translate-y-1/2
-                           text-[#9E9E9E] hover:text-[#4A4A4A] transition-colors duration-150
+                           text-[#9E9E9E] hover:text-[#4A4A4A]
+                           dark:text-[#717171] dark:hover:text-[#C4C4C4]
+                           transition-colors duration-150
                            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]
                            rounded-sm p-0.5"
               >
@@ -249,9 +234,12 @@ export default function RegisterPage() {
           {/* Submit Button */}
           <button
             type="submit"
-            className="mt-1 h-12 w-full rounded-lg bg-[#0A0A0A] text-base font-semibold text-white
+            className="mt-1 h-12 w-full rounded-lg font-semibold text-base
+                       bg-[#0A0A0A] text-white
+                       dark:bg-[#F0F0F0] dark:text-[#0A0A0A]
                        transition-all duration-150
                        hover:bg-[#1F1F1F] hover:-translate-y-px hover:shadow-sm
+                       dark:hover:bg-[#E0E0E0]
                        active:translate-y-0 active:opacity-95
                        focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[rgba(37,99,235,0.25)]
                        disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0"
@@ -263,18 +251,21 @@ export default function RegisterPage() {
 
         {/* Divider */}
         <div className="my-6 flex items-center gap-3">
-          <div className="h-px flex-1 bg-[#E0E0E0]" aria-hidden="true" />
-          <span className="text-xs text-[#9E9E9E] font-medium">hoặc</span>
-          <div className="h-px flex-1 bg-[#E0E0E0]" aria-hidden="true" />
+          <div className="h-px flex-1 bg-[#E0E0E0] dark:bg-[#2E2E2E]" aria-hidden="true" />
+          <span className="text-xs text-[#9E9E9E] dark:text-[#717171] font-medium">hoặc</span>
+          <div className="h-px flex-1 bg-[#E0E0E0] dark:bg-[#2E2E2E]" aria-hidden="true" />
         </div>
 
         {/* Login link */}
-        <p className="text-center text-sm text-[#4A4A4A]">
+        <p className="text-center text-sm text-[#4A4A4A] dark:text-[#9E9E9E]">
           Đã có tài khoản?{' '}
           <Link
             to="/login"
-            className="font-semibold text-[#0A0A0A] underline underline-offset-2
-                       hover:text-[#4A4A4A] transition-colors duration-150
+            className="font-semibold
+                       text-[#0A0A0A] dark:text-[#F0F0F0]
+                       underline underline-offset-2
+                       hover:text-[#4A4A4A] dark:hover:text-[#C4C4C4]
+                       transition-colors duration-150
                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]
                        rounded-sm"
           >
