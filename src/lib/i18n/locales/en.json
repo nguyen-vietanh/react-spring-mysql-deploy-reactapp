@@ -1,0 +1,43 @@
+{
+  "common": {
+    "or": "or",
+    "required": "Required"
+  },
+  "theme": {
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode"
+  },
+  "auth": {
+    "register": {
+      "pageTitle": "Create account",
+      "brandHome": "Bookstore home page",
+      "heading": "Create account",
+      "subheading": "Sign up to start shopping",
+      "fields": {
+        "fullName": {
+          "label": "Full name",
+          "placeholder": "John Doe"
+        },
+        "email": {
+          "label": "Email",
+          "placeholder": "you@example.com"
+        },
+        "password": {
+          "label": "Password",
+          "placeholder": "At least 8 characters",
+          "show": "Show password",
+          "hide": "Hide password"
+        },
+        "confirmPassword": {
+          "label": "Confirm password",
+          "placeholder": "Re-enter your password",
+          "show": "Show confirm password",
+          "hide": "Hide confirm password"
+        }
+      },
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "login": "Log in"
+    }
+  }
+}

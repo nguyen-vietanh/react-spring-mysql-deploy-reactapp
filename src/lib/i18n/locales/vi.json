@@ -1,0 +1,43 @@
+{
+  "common": {
+    "or": "hoặc",
+    "required": "Bắt buộc"
+  },
+  "theme": {
+    "switchToLight": "Chuyển sang chế độ sáng",
+    "switchToDark": "Chuyển sang chế độ tối"
+  },
+  "auth": {
+    "register": {
+      "pageTitle": "Đăng ký tài khoản",
+      "brandHome": "Trang chủ Website Bán Sách",
+      "heading": "Tạo tài khoản",
+      "subheading": "Đăng ký để bắt đầu mua sách",
+      "fields": {
+        "fullName": {
+          "label": "Họ tên",
+          "placeholder": "Nguyễn Văn A"
+        },
+        "email": {
+          "label": "Email",
+          "placeholder": "ten@example.com"
+        },
+        "password": {
+          "label": "Mật khẩu",
+          "placeholder": "Tối thiểu 8 ký tự",
+          "show": "Hiện mật khẩu",
+          "hide": "Ẩn mật khẩu"
+        },
+        "confirmPassword": {
+          "label": "Xác nhận mật khẩu",
+          "placeholder": "Nhập lại mật khẩu",
+          "show": "Hiện mật khẩu xác nhận",
+          "hide": "Ẩn mật khẩu xác nhận"
+        }
+      },
+      "submit": "Đăng ký",
+      "haveAccount": "Đã có tài khoản?",
+      "login": "Đăng nhập"
+    }
+  }
+}

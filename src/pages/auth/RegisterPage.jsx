@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { useTranslation } from 'react-i18next'
 
 // Password visibility toggle icon
 function EyeIcon({ open }) {
@@ -23,6 +24,7 @@ function EyeIcon({ open }) {
 
 // Reusable form field
 function FormField({ id, label, required, error, children }) {
+  const { t } = useTranslation()
   return (
     <div className="flex flex-col gap-1.5">
       <label
@@ -33,7 +35,7 @@ function FormField({ id, label, required, error, children }) {
         {required && (
           <>
             <span aria-hidden="true" className="ml-0.5 text-[#DC2626]">*</span>
-            <span className="sr-only">(Bắt buộc)</span>
+            <span className="sr-only">({t('common.required')})</span>
           </>
         )}
       </label>
@@ -52,7 +54,7 @@ function FormField({ id, label, required, error, children }) {
   )
 }
 
-// Input class builder — kept as a function to avoid duplicating the long string 4 times
+// Input class builder — avoids duplicating the long string across 4 inputs
 function inputClass(hasError) {
   return `
     h-12 w-full rounded-lg border px-4 text-base
@@ -69,6 +71,7 @@ function inputClass(hasError) {
 }
 
 export default function RegisterPage() {
+  const { t } = useTranslation()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -93,13 +96,15 @@ export default function RegisterPage() {
     // TODO: wire FE validation + API call
   }
 
+  const ns = 'auth.register'
+
   return (
     <main
       className="min-h-screen
                  bg-[#FFFFFF] dark:bg-[#111111]
                  flex flex-col items-center justify-center px-4 py-12
                  transition-colors duration-200"
-      aria-label="Trang đăng ký tài khoản"
+      aria-label={t(`${ns}.pageTitle`)}
     >
       {/* Card container */}
       <div className="w-full max-w-[480px]">
@@ -113,7 +118,7 @@ export default function RegisterPage() {
                        tracking-tight
                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]
                        rounded-sm transition-colors duration-150"
-            aria-label="Trang chủ Website Bán Sách"
+            aria-label={t(`${ns}.brandHome`)}
           >
             Bookstore
           </Link>
@@ -122,10 +127,10 @@ export default function RegisterPage() {
         {/* Heading */}
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-[#0A0A0A] dark:text-[#F0F0F0] tracking-tight leading-tight">
-            Tạo tài khoản
+            {t(`${ns}.heading`)}
           </h1>
           <p className="mt-2 text-base text-[#4A4A4A] dark:text-[#9E9E9E]">
-            Đăng ký để bắt đầu mua sách
+            {t(`${ns}.subheading`)}
           </p>
         </div>
 
@@ -133,19 +138,24 @@ export default function RegisterPage() {
         <form
           onSubmit={handleSubmit}
           noValidate
-          aria-label="Form đăng ký tài khoản"
+          aria-label={t(`${ns}.pageTitle`)}
           className="flex flex-col gap-5"
         >
 
           {/* Full Name */}
-          <FormField id="fullName" label="Họ tên" required error={errors.fullName}>
+          <FormField
+            id="fullName"
+            label={t(`${ns}.fields.fullName.label`)}
+            required
+            error={errors.fullName}
+          >
             <input
               id="fullName"
               type="text"
               name="fullName"
               autoComplete="name"
               defaultValue={fields.fullName}
-              placeholder="Nguyễn Văn A"
+              placeholder={t(`${ns}.fields.fullName.placeholder`)}
               aria-required="true"
               aria-invalid={errors.fullName ? 'true' : 'false'}
               aria-describedby="fullName-error"
@@ -154,14 +164,19 @@ export default function RegisterPage() {
           </FormField>
 
           {/* Email */}
-          <FormField id="email" label="Email" required error={errors.email}>
+          <FormField
+            id="email"
+            label={t(`${ns}.fields.email.label`)}
+            required
+            error={errors.email}
+          >
             <input
               id="email"
               type="email"
               name="email"
               autoComplete="email"
               defaultValue={fields.email}
-              placeholder="ten@example.com"
+              placeholder={t(`${ns}.fields.email.placeholder`)}
               aria-required="true"
               aria-invalid={errors.email ? 'true' : 'false'}
               aria-describedby="email-error"
@@ -170,7 +185,12 @@ export default function RegisterPage() {
           </FormField>
 
           {/* Password */}
-          <FormField id="password" label="Mật khẩu" required error={errors.password}>
+          <FormField
+            id="password"
+            label={t(`${ns}.fields.password.label`)}
+            required
+            error={errors.password}
+          >
             <div className="relative">
               <input
                 id="password"
@@ -178,7 +198,7 @@ export default function RegisterPage() {
                 name="password"
                 autoComplete="new-password"
                 defaultValue={fields.password}
-                placeholder="Tối thiểu 8 ký tự"
+                placeholder={t(`${ns}.fields.password.placeholder`)}
                 aria-required="true"
                 aria-invalid={errors.password ? 'true' : 'false'}
                 aria-describedby="password-error"
@@ -187,7 +207,7 @@ export default function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                aria-label={t(`${ns}.fields.password.${showPassword ? 'hide' : 'show'}`)}
                 className="absolute right-3 top-1/2 -translate-y-1/2
                            text-[#9E9E9E] hover:text-[#4A4A4A]
                            dark:text-[#717171] dark:hover:text-[#C4C4C4]
@@ -201,7 +221,12 @@ export default function RegisterPage() {
           </FormField>
 
           {/* Confirm Password */}
-          <FormField id="confirmPassword" label="Xác nhận mật khẩu" required error={errors.confirmPassword}>
+          <FormField
+            id="confirmPassword"
+            label={t(`${ns}.fields.confirmPassword.label`)}
+            required
+            error={errors.confirmPassword}
+          >
             <div className="relative">
               <input
                 id="confirmPassword"
@@ -209,7 +234,7 @@ export default function RegisterPage() {
                 name="confirmPassword"
                 autoComplete="new-password"
                 defaultValue={fields.confirmPassword}
-                placeholder="Nhập lại mật khẩu"
+                placeholder={t(`${ns}.fields.confirmPassword.placeholder`)}
                 aria-required="true"
                 aria-invalid={errors.confirmPassword ? 'true' : 'false'}
                 aria-describedby="confirmPassword-error"
@@ -218,7 +243,7 @@ export default function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword((v) => !v)}
-                aria-label={showConfirmPassword ? 'Ẩn mật khẩu xác nhận' : 'Hiện mật khẩu xác nhận'}
+                aria-label={t(`${ns}.fields.confirmPassword.${showConfirmPassword ? 'hide' : 'show'}`)}
                 className="absolute right-3 top-1/2 -translate-y-1/2
                            text-[#9E9E9E] hover:text-[#4A4A4A]
                            dark:text-[#717171] dark:hover:text-[#C4C4C4]
@@ -244,7 +269,7 @@ export default function RegisterPage() {
                        focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[rgba(37,99,235,0.25)]
                        disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0"
           >
-            Đăng ký
+            {t(`${ns}.submit`)}
           </button>
 
         </form>
@@ -252,13 +277,15 @@ export default function RegisterPage() {
         {/* Divider */}
         <div className="my-6 flex items-center gap-3">
           <div className="h-px flex-1 bg-[#E0E0E0] dark:bg-[#2E2E2E]" aria-hidden="true" />
-          <span className="text-xs text-[#9E9E9E] dark:text-[#717171] font-medium">hoặc</span>
+          <span className="text-xs text-[#9E9E9E] dark:text-[#717171] font-medium">
+            {t('common.or')}
+          </span>
           <div className="h-px flex-1 bg-[#E0E0E0] dark:bg-[#2E2E2E]" aria-hidden="true" />
         </div>
 
         {/* Login link */}
         <p className="text-center text-sm text-[#4A4A4A] dark:text-[#9E9E9E]">
-          Đã có tài khoản?{' '}
+          {t(`${ns}.haveAccount`)}{' '}
           <Link
             to="/login"
             className="font-semibold
@@ -269,7 +296,7 @@ export default function RegisterPage() {
                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]
                        rounded-sm"
           >
-            Đăng nhập
+            {t(`${ns}.login`)}
           </Link>
         </p>
 
