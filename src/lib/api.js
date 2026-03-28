@@ -1,13 +1,13 @@
 import axios from 'axios'
-import i18n from './i18n/i18n'
 import { ERROR_CODES } from './constants/errors'
+import i18n from './i18n/i18n'
 
 const api = axios.create({
   baseURL: `${import.meta.env.VITE_BE_BASE_URL}/api/v1`,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 15_000,
+  timeout: 5_000,
 })
 
 // ---------------------------------------------------------------------------
