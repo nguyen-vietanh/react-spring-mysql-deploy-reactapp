@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
+import { toast } from 'react-hot-toast'
 import { registerUser } from '../../features/auth/api'
 
 // ---------------------------------------------------------------------------
@@ -171,8 +172,8 @@ export default function RegisterPage() {
   // Field-level errors from the BE (VALIDATION_FAILED / EMAIL_ALREADY_EXISTS)
   const [fieldErrors, setFieldErrors] = useState({})
 
-  // Banner state: { variant: 'success'|'warning'|'error', title?, message }
-  const [banner, setBanner] = useState(null)
+  // Flag to hide form after successful registration
+  const [isRegistered, setIsRegistered] = useState(false)
 
   // Focus the first field with an error after a failed submission
   const fieldRefs = {
@@ -188,7 +189,6 @@ export default function RegisterPage() {
 
     // Clear previous state
     setFieldErrors({})
-    setBanner(null)
 
     const formData = new FormData(e.currentTarget)
     const payload = {
@@ -204,16 +204,10 @@ export default function RegisterPage() {
 
       // Distinguish happy-path from partial-success (email send failed — flow 7a)
       if (result.data?.emailSent === false) {
-        setBanner({
-          variant: 'warning',
-          message: t(`${ns}.success.emailFailed`),
-        })
+        toast.error(t(`${ns}.success.emailFailed`))
       } else {
-        setBanner({
-          variant: 'success',
-          title: t(`${ns}.success.title`),
-          message: t(`${ns}.success.message`),
-        })
+        toast.success(t(`${ns}.success.title`) + ': ' + t(`${ns}.success.message`))
+        setIsRegistered(true)
       }
 
       // Reset form on success so user can't accidentally resubmit
@@ -234,13 +228,11 @@ export default function RegisterPage() {
       // Always show a banner for global errors; skip if field errors are already
       // self-explanatory (VALIDATION_FAILED with inline messages covers it)
       if (!hasFieldErrors || code !== 'VALIDATION_FAILED') {
-        // Use the localized message from BE (it's already handled i18n).
-        // For FE errors like NETWORK_ERROR, we still use local translation.
         const message = code === 'NETWORK_ERROR'
           ? t(`${ns}.errors.${code}`)
           : (err.message || t(`${ns}.errors.UNKNOWN_ERROR`))
 
-        setBanner({ variant: 'error', message })
+        toast.error(message)
       }
     } finally {
       setIsSubmitting(false)
@@ -281,19 +273,16 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {/* Global banner (success / warning / error) */}
-        {banner && (
-          <div className="mb-6">
-            <AlertBanner
-              variant={banner.variant}
-              title={banner.title}
-              message={banner.message}
-            />
+        {/* Form — hide after a clean success */}
+        {isRegistered ? (
+          <div className="text-center p-8 bg-[#F0FDF4] dark:bg-[#0d2e1a] rounded-lg border border-[#BBF7D0] dark:border-[#166534]">
+            <span className="inline-block p-3 rounded-full bg-[#16A34A] text-white mb-4">
+              <CheckCircleIcon />
+            </span>
+            <h2 className="text-xl font-bold text-[#15803D] dark:text-[#4ade80] mb-2">{t(`${ns}.success.title`)}</h2>
+            <p className="text-[#15803D] dark:text-[#86efac]">{t(`${ns}.success.message`)}</p>
           </div>
-        )}
-
-        {/* Form — hide after a clean success (emailSent not false) */}
-        {banner?.variant !== 'success' && (
+        ) : (
           <form
             onSubmit={handleSubmit}
             noValidate
