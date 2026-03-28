@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
 import { toast } from 'react-toastify'
 import { registerUser } from '../../features/auth/api'
+import { ERROR_CODES } from '../../lib/constants/errors'
 
 // ---------------------------------------------------------------------------
 // Icons
@@ -169,7 +170,7 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Field-level errors from the BE (VALIDATION_FAILED / EMAIL_ALREADY_EXISTS)
+  // Field-level errors from the BE (ERROR_CODES.VALIDATION_FAILED / ERROR_CODES.EMAIL_ALREADY_EXISTS)
   const [fieldErrors, setFieldErrors] = useState({})
 
   // Flag to hide form after successful registration
@@ -202,10 +203,7 @@ export default function RegisterPage() {
     try {
       const result = await registerUser(payload)
 
-      // Distinguish happy-path from partial-success (email send failed — flow 7a)
-      if (result.data?.emailSent === false) {
-        toast.error(t(`${ns}.success.emailFailed`))
-      } else {
+      if (result.status === 201) {
         toast.success(t(`${ns}.success.title`) + ': ' + t(`${ns}.success.message`))
         setIsRegistered(true)
       }
@@ -213,7 +211,7 @@ export default function RegisterPage() {
       // Reset form on success so user can't accidentally resubmit
       e.target.reset()
     } catch (err) {
-      const code = err.code ?? 'UNKNOWN_ERROR'
+      const code = err.code ?? ERROR_CODES.UNKNOWN_ERROR
       const fieldErrs = toFieldErrors(err.errors)
       const hasFieldErrors = Object.keys(fieldErrs).length > 0
 
@@ -227,10 +225,10 @@ export default function RegisterPage() {
 
       // Always show a banner for global errors; skip if field errors are already
       // self-explanatory (VALIDATION_FAILED with inline messages covers it)
-      if (!hasFieldErrors || code !== 'VALIDATION_FAILED') {
-        const message = code === 'NETWORK_ERROR'
+      if (!hasFieldErrors || code !== ERROR_CODES.VALIDATION_FAILED) {
+        const message = code === ERROR_CODES.NETWORK_ERROR
           ? t(`${ns}.errors.${code}`)
-          : (err.message || t(`${ns}.errors.UNKNOWN_ERROR`))
+          : (err.message || t(`${ns}.errors.${ERROR_CODES.UNKNOWN_ERROR}`))
 
         toast.error(message)
       }
