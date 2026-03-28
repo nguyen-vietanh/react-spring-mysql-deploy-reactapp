@@ -1,6 +1,6 @@
-import { useState, useRef } from 'react'
-import { Link } from 'react-router'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router'
 import { registerUser } from '../../features/auth/api'
 
 // ---------------------------------------------------------------------------
