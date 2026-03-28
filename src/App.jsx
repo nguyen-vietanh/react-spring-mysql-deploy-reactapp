@@ -1,7 +1,7 @@
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
-import { toast } from 'react-hot-toast'
+import { toast } from 'react-toastify'
 import './App.css'
 
 function App() {
@@ -50,14 +50,12 @@ function App() {
           <ul>
             <li>
               <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
+                <img className="logo" src={viteLogo} alt="" /> Explore Vite
               </a>
             </li>
             <li>
               <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
+                <img className="button-icon" src={reactLogo} alt="" /> Learn more
               </a>
             </li>
           </ul>
