@@ -37,6 +37,7 @@
       },
       "submit": "Create account",
       "submitting": "Creating account...",
+      "signupWithGoogle": "Sign up with Google",
       "haveAccount": "Already have an account?",
       "login": "Log in",
       "success": {

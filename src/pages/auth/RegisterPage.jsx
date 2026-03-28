@@ -50,6 +50,17 @@ function AlertIcon() {
   )
 }
 
+function GoogleIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
+      <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z" />
+      <path fill="#FF3D00" d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z" />
+      <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z" />
+      <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002l6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" />
+    </svg>
+  )
+}
+
 // ---------------------------------------------------------------------------
 // Sub-components
 // ---------------------------------------------------------------------------
@@ -72,7 +83,6 @@ function FormField({ id, label, required, error, children }) {
 
       {children}
 
-      {/* Reserve height so layout doesn't shift when error appears */}
       <span
         id={`${id}-error`}
         role="alert"
@@ -102,55 +112,6 @@ function inputClass(hasError) {
 }
 
 // ---------------------------------------------------------------------------
-// Alert banner — used for success and global (non-field) errors
-// ---------------------------------------------------------------------------
-function AlertBanner({ variant, title, message }) {
-  const isSuccess = variant === 'success'
-
-  // Map variant to styling classes to avoid nested ternaries
-  const styles = {
-    success: {
-      container: 'bg-[#F0FDF4] border-[#BBF7D0] dark:bg-[#0d2e1a] dark:border-[#166534]',
-      icon: 'text-[#16A34A] dark:text-[#4ade80]',
-      title: 'text-[#15803D] dark:text-[#4ade80]',
-      message: 'text-[#15803D] dark:text-[#86efac]',
-    },
-    warning: {
-      container: 'bg-[#FFFBEB] border-[#FDE68A] dark:bg-[#2a1e00] dark:border-[#92400e]',
-      icon: 'text-[#D97706] dark:text-[#fbbf24]',
-      title: 'text-[#B45309] dark:text-[#fbbf24]',
-      message: 'text-[#B45309] dark:text-[#fde68a]',
-    },
-    error: {
-      container: 'bg-[#FEF2F2] border-[#FECACA] dark:bg-[#2D1515] dark:border-[#991b1b]',
-      icon: 'text-[#DC2626] dark:text-[#f87171]',
-      title: 'text-[#B91C1C] dark:text-[#f87171]',
-      message: 'text-[#B91C1C] dark:text-[#fca5a5]',
-    },
-  }
-
-  const currentStyle = styles[variant] || styles.error
-
-  return (
-    <output
-      role={isSuccess ? 'status' : 'alert'}
-      aria-live={isSuccess ? 'polite' : 'assertive'}
-      className={`flex gap-3 rounded-lg border p-4 ${currentStyle.container}`}
-    >
-      <span className={`shrink-0 mt-0.5 ${currentStyle.icon}`}>
-        {isSuccess ? <CheckCircleIcon /> : <AlertIcon />}
-      </span>
-      <div className="flex flex-col gap-0.5">
-        {title && (
-          <p className={`text-sm font-semibold ${currentStyle.title}`}>{title}</p>
-        )}
-        <p className={`text-sm ${currentStyle.message}`}>{message}</p>
-      </div>
-    </output>
-  )
-}
-
-// ---------------------------------------------------------------------------
 // Page
 // ---------------------------------------------------------------------------
 
@@ -170,7 +131,7 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Field-level errors from the BE (ERROR_CODES.VALIDATION_FAILED / ERROR_CODES.EMAIL_ALREADY_EXISTS)
+  // Field-level errors from the BE
   const [fieldErrors, setFieldErrors] = useState({})
 
   // Flag to hide form after successful registration
@@ -188,7 +149,6 @@ export default function RegisterPage() {
     e.preventDefault()
     if (isSubmitting) return
 
-    // Clear previous state
     setFieldErrors({})
 
     const formData = new FormData(e.currentTarget)
@@ -207,8 +167,6 @@ export default function RegisterPage() {
         toast.success(t(`${ns}.success.title`) + ': ' + t(`${ns}.success.message`))
         setIsRegistered(true)
       }
-
-      // Reset form on success so user can't accidentally resubmit
       e.target.reset()
     } catch (err) {
       const code = err.code ?? ERROR_CODES.UNKNOWN_ERROR
@@ -217,19 +175,14 @@ export default function RegisterPage() {
 
       if (hasFieldErrors) {
         setFieldErrors(fieldErrs)
-        // Focus the first field that has an error
-        const firstErrField = ['fullName', 'email', 'password', 'confirmPassword']
-          .find((f) => fieldErrs[f])
+        const firstErrField = ['fullName', 'email', 'password', 'confirmPassword'].find((f) => fieldErrs[f])
         fieldRefs[firstErrField]?.current?.focus()
       }
 
-      // Always show a banner for global errors; skip if field errors are already
-      // self-explanatory (VALIDATION_FAILED with inline messages covers it)
       if (!hasFieldErrors || code !== ERROR_CODES.VALIDATION_FAILED) {
         const message = code === ERROR_CODES.NETWORK_ERROR
           ? t(`${ns}.errors.${code}`)
           : (err.message || t(`${ns}.errors.${ERROR_CODES.UNKNOWN_ERROR}`))
-
         toast.error(message)
       }
     } finally {
@@ -271,7 +224,7 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {/* Form — hide after a clean success */}
+        {/* Content */}
         {isRegistered ? (
           <div className="text-center p-8 bg-[#F0FDF4] dark:bg-[#0d2e1a] rounded-lg border border-[#BBF7D0] dark:border-[#166534]">
             <span className="inline-block p-3 rounded-full bg-[#16A34A] text-white mb-4">
@@ -281,160 +234,177 @@ export default function RegisterPage() {
             <p className="text-[#15803D] dark:text-[#86efac]">{t(`${ns}.success.message`)}</p>
           </div>
         ) : (
-          <form
-            onSubmit={handleSubmit}
-            noValidate
-            aria-label={t(`${ns}.pageTitle`)}
-            className="flex flex-col gap-5"
-          >
-            {/* Full Name */}
-            <FormField
-              id="fullName"
-              label={t(`${ns}.fields.fullName.label`)}
-              required
-              error={fieldErrors.fullName}
+          <>
+            <form
+              onSubmit={handleSubmit}
+              noValidate
+              className="flex flex-col gap-5"
             >
-              <input
-                ref={fieldRefs.fullName}
+              <FormField
                 id="fullName"
-                type="text"
-                name="fullName"
-                autoComplete="name"
-                disabled={isSubmitting}
-                placeholder={t(`${ns}.fields.fullName.placeholder`)}
-                aria-required="true"
-                aria-invalid={fieldErrors.fullName ? 'true' : 'false'}
-                aria-describedby="fullName-error"
-                className={inputClass(fieldErrors.fullName)}
-              />
-            </FormField>
+                label={t(`${ns}.fields.fullName.label`)}
+                required
+                error={fieldErrors.fullName}
+              >
+                <input
+                  ref={fieldRefs.fullName}
+                  id="fullName"
+                  type="text"
+                  name="fullName"
+                  autoComplete="name"
+                  disabled={isSubmitting}
+                  placeholder={t(`${ns}.fields.fullName.placeholder`)}
+                  aria-required="true"
+                  aria-invalid={fieldErrors.fullName ? 'true' : 'false'}
+                  aria-describedby="fullName-error"
+                  className={inputClass(fieldErrors.fullName)}
+                />
+              </FormField>
 
-            {/* Email */}
-            <FormField
-              id="email"
-              label={t(`${ns}.fields.email.label`)}
-              required
-              error={fieldErrors.email}
-            >
-              <input
-                ref={fieldRefs.email}
+              <FormField
                 id="email"
-                type="email"
-                name="email"
-                autoComplete="email"
+                label={t(`${ns}.fields.email.label`)}
+                required
+                error={fieldErrors.email}
+              >
+                <input
+                  ref={fieldRefs.email}
+                  id="email"
+                  type="email"
+                  name="email"
+                  autoComplete="email"
+                  disabled={isSubmitting}
+                  placeholder={t(`${ns}.fields.email.placeholder`)}
+                  aria-required="true"
+                  aria-invalid={fieldErrors.email ? 'true' : 'false'}
+                  aria-describedby="email-error"
+                  className={inputClass(fieldErrors.email)}
+                />
+              </FormField>
+
+              <FormField
+                id="password"
+                label={t(`${ns}.fields.password.label`)}
+                required
+                error={fieldErrors.password}
+              >
+                <div className="relative">
+                  <input
+                    ref={fieldRefs.password}
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    autoComplete="new-password"
+                    disabled={isSubmitting}
+                    placeholder={t(`${ns}.fields.password.placeholder`)}
+                    aria-required="true"
+                    aria-invalid={fieldErrors.password ? 'true' : 'false'}
+                    aria-describedby="password-error"
+                    className={inputClass(fieldErrors.password) + ' pr-12'}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={t(`${ns}.fields.password.${showPassword ? 'hide' : 'show'}`)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2
+                               text-[#9E9E9E] hover:text-[#4A4A4A]
+                               dark:text-[#717171] dark:hover:text-[#C4C4C4]
+                               transition-colors duration-150
+                               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]
+                               rounded-sm p-0.5"
+                  >
+                    <EyeIcon open={showPassword} />
+                  </button>
+                </div>
+              </FormField>
+
+              <FormField
+                id="confirmPassword"
+                label={t(`${ns}.fields.confirmPassword.label`)}
+                required
+                error={fieldErrors.confirmPassword}
+              >
+                <div className="relative">
+                  <input
+                    ref={fieldRefs.confirmPassword}
+                    id="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    name="confirmPassword"
+                    autoComplete="new-password"
+                    disabled={isSubmitting}
+                    placeholder={t(`${ns}.fields.confirmPassword.placeholder`)}
+                    aria-required="true"
+                    aria-invalid={fieldErrors.confirmPassword ? 'true' : 'false'}
+                    aria-describedby="confirmPassword-error"
+                    className={inputClass(fieldErrors.confirmPassword) + ' pr-12'}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword((v) => !v)}
+                    aria-label={t(`${ns}.fields.confirmPassword.${showConfirmPassword ? 'hide' : 'show'}`)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2
+                               text-[#9E9E9E] hover:text-[#4A4A4A]
+                               dark:text-[#717171] dark:hover:text-[#C4C4C4]
+                               transition-colors duration-150
+                               focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]
+                               rounded-sm p-0.5"
+                  >
+                    <EyeIcon open={showConfirmPassword} />
+                  </button>
+                </div>
+              </FormField>
+
+              <button
+                type="submit"
                 disabled={isSubmitting}
-                placeholder={t(`${ns}.fields.email.placeholder`)}
-                aria-required="true"
-                aria-invalid={fieldErrors.email ? 'true' : 'false'}
-                aria-describedby="email-error"
-                className={inputClass(fieldErrors.email)}
-              />
-            </FormField>
+                aria-busy={isSubmitting}
+                className="mt-1 h-12 w-full rounded-lg font-semibold text-base
+                           bg-[#0A0A0A] text-white
+                           dark:bg-[#F0F0F0] dark:text-[#0A0A0A]
+                           transition-all duration-150
+                           hover:bg-[#1F1F1F] hover:-translate-y-px hover:shadow-sm
+                           dark:hover:bg-[#E0E0E0]
+                           active:translate-y-0 active:opacity-95
+                           focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[rgba(37,99,235,0.25)]
+                           disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0"
+              >
+                {isSubmitting ? t(`${ns}.submitting`) : t(`${ns}.submit`)}
+              </button>
+            </form>
 
-            {/* Password */}
-            <FormField
-              id="password"
-              label={t(`${ns}.fields.password.label`)}
-              required
-              error={fieldErrors.password}
-            >
-              <div className="relative">
-                <input
-                  ref={fieldRefs.password}
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  autoComplete="new-password"
-                  disabled={isSubmitting}
-                  placeholder={t(`${ns}.fields.password.placeholder`)}
-                  aria-required="true"
-                  aria-invalid={fieldErrors.password ? 'true' : 'false'}
-                  aria-describedby="password-error"
-                  className={inputClass(fieldErrors.password) + ' pr-12'}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  aria-label={t(`${ns}.fields.password.${showPassword ? 'hide' : 'show'}`)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2
-                             text-[#9E9E9E] hover:text-[#4A4A4A]
-                             dark:text-[#717171] dark:hover:text-[#C4C4C4]
-                             transition-colors duration-150
-                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]
-                             rounded-sm p-0.5"
-                >
-                  <EyeIcon open={showPassword} />
-                </button>
-              </div>
-            </FormField>
+            <div className="my-6 flex items-center gap-3">
+              <div className="h-px flex-1 bg-[#E0E0E0] dark:bg-[#2E2E2E]" aria-hidden="true" />
+              <span className="text-xs text-[#9E9E9E] dark:text-[#717171] font-medium uppercase tracking-wider">
+                {t('common.or')}
+              </span>
+              <div className="h-px flex-1 bg-[#E0E0E0] dark:bg-[#2E2E2E]" aria-hidden="true" />
+            </div>
 
-            {/* Confirm Password */}
-            <FormField
-              id="confirmPassword"
-              label={t(`${ns}.fields.confirmPassword.label`)}
-              required
-              error={fieldErrors.confirmPassword}
-            >
-              <div className="relative">
-                <input
-                  ref={fieldRefs.confirmPassword}
-                  id="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  name="confirmPassword"
-                  autoComplete="new-password"
-                  disabled={isSubmitting}
-                  placeholder={t(`${ns}.fields.confirmPassword.placeholder`)}
-                  aria-required="true"
-                  aria-invalid={fieldErrors.confirmPassword ? 'true' : 'false'}
-                  aria-describedby="confirmPassword-error"
-                  className={inputClass(fieldErrors.confirmPassword) + ' pr-12'}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword((v) => !v)}
-                  aria-label={t(`${ns}.fields.confirmPassword.${showConfirmPassword ? 'hide' : 'show'}`)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2
-                             text-[#9E9E9E] hover:text-[#4A4A4A]
-                             dark:text-[#717171] dark:hover:text-[#C4C4C4]
-                             transition-colors duration-150
-                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]
-                             rounded-sm p-0.5"
-                >
-                  <EyeIcon open={showConfirmPassword} />
-                </button>
-              </div>
-            </FormField>
-
-            {/* Submit */}
             <button
-              type="submit"
+              type="button"
               disabled={isSubmitting}
-              aria-busy={isSubmitting}
-              className="mt-1 h-12 w-full rounded-lg font-semibold text-base
-                         bg-[#0A0A0A] text-white
-                         dark:bg-[#F0F0F0] dark:text-[#0A0A0A]
+              onClick={() => {
+                const backendUrl = import.meta.env.VITE_BE_BASE_URL
+                window.location.href = `${backendUrl}/oauth2/authorization/google`
+              }}
+              className="flex items-center justify-center gap-2.5
+                         h-12 w-full rounded-lg font-semibold text-base
+                         bg-white text-[#0A0A0A] border border-[#E0E0E0]
+                         dark:bg-[#111111] dark:text-[#F0F0F0] dark:border-[#2E2E2E]
                          transition-all duration-150
-                         hover:bg-[#1F1F1F] hover:-translate-y-px hover:shadow-sm
-                         dark:hover:bg-[#E0E0E0]
-                         active:translate-y-0 active:opacity-95
+                         hover:bg-[#F8F8F8] hover:border-[#C4C4C4] hover:-translate-y-px hover:shadow-xs
+                         dark:hover:bg-[#1F1F1F] dark:hover:border-[#4A4A4A]
+                         active:translate-y-0 active:bg-white dark:active:bg-[#111111]
                          focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[rgba(37,99,235,0.25)]
                          disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0"
             >
-              {isSubmitting ? t(`${ns}.submitting`) : t(`${ns}.submit`)}
+              <GoogleIcon />
+              {t(`${ns}.signupWithGoogle`)}
             </button>
-          </form>
+          </>
         )}
 
-        {/* Divider + login link — always visible */}
-        <div className="my-6 flex items-center gap-3">
-          <div className="h-px flex-1 bg-[#E0E0E0] dark:bg-[#2E2E2E]" aria-hidden="true" />
-          <span className="text-xs text-[#9E9E9E] dark:text-[#717171] font-medium">
-            {t('common.or')}
-          </span>
-          <div className="h-px flex-1 bg-[#E0E0E0] dark:bg-[#2E2E2E]" aria-hidden="true" />
-        </div>
-
-        <p className="text-center text-sm text-[#4A4A4A] dark:text-[#9E9E9E]">
+        <p className="mt-8 text-center text-sm text-[#4A4A4A] dark:text-[#9E9E9E]">
           {t(`${ns}.haveAccount`)}{' '}
           <Link
             to="/login"
@@ -449,7 +419,6 @@ export default function RegisterPage() {
             {t(`${ns}.login`)}
           </Link>
         </p>
-
       </div>
     </main>
   )

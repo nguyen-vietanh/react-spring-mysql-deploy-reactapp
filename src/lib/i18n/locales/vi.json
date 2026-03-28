@@ -37,6 +37,7 @@
       },
       "submit": "Đăng ký",
       "submitting": "Đang đăng ký...",
+      "signupWithGoogle": "Đăng ký bằng Google",
       "haveAccount": "Đã có tài khoản?",
       "login": "Đăng nhập",
       "success": {
