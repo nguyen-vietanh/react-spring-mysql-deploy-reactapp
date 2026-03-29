@@ -1,6 +1,25 @@
 import axios from 'axios'
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 import { ERROR_CODES } from './constants/errors'
 import i18n from './i18n/i18n'
+
+// NProgress Configuration
+NProgress.configure({ 
+  showSpinner: false, 
+  trickleSpeed: 200,
+  minimum: 0.08
+})
+
+let activeRequests = 0
+
+const stopProgress = () => {
+  activeRequests--
+  if (activeRequests <= 0) {
+    activeRequests = 0
+    NProgress.done()
+  }
+}
 
 const api = axios.create({
   baseURL: `${import.meta.env.VITE_BE_BASE_URL}/api/v1`,
@@ -15,6 +34,9 @@ const api = axios.create({
 // Request interceptor — attach auth token and language preference
 // ---------------------------------------------------------------------------
 api.interceptors.request.use((config) => {
+  if (activeRequests === 0) NProgress.start()
+  activeRequests++
+
   // Add Accept-Language header based on current locale
   config.headers['Accept-Language'] = i18n.language || 'vi'
 
@@ -36,8 +58,12 @@ api.interceptors.request.use((config) => {
 //   error.status  — HTTP status number
 // ---------------------------------------------------------------------------
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    stopProgress()
+    return response
+  },
   (error) => {
+    stopProgress()
     const status = error.response?.status
     const body = error.response?.data
 
